@@ -8,6 +8,16 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=Sora:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script>
+  (function () {
+    var t = null;
+    try { t = localStorage.getItem('recall-theme'); } catch (e) {}
+    if (t !== 'dark' && t !== 'light') {
+      t = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    }
+    document.documentElement.setAttribute('data-theme', t);
+  })();
+</script>
 <style>
   :root {
     --bg-light: #f0f2f5;
@@ -730,6 +740,149 @@
     .submit-btn { padding: 12px; margin-top: 4px; }
     .secondary-action { margin-top: 10px; }
   }
+
+  /* ========================================================= */
+  /* THEMES: light (default) + dark. Liquid glass kept in both. */
+  /* ========================================================= */
+  :root { color-scheme: light; }
+
+  .theme-toggle {
+    position: fixed; top: 34px; right: 34px; z-index: 5;
+    width: 40px; height: 40px; padding: 0; border-radius: 50%;
+    display: grid; place-items: center; cursor: pointer;
+    color: var(--red-deep);
+    background:
+      radial-gradient(120% 90% at 20% 0%, rgba(255,255,255,0.7), transparent 60%),
+      rgba(255,255,255,0.22);
+    border: 1px solid rgba(255,255,255,0.7);
+    -webkit-backdrop-filter: blur(16px) saturate(200%);
+    backdrop-filter: blur(16px) saturate(200%);
+    box-shadow: 0 8px 22px rgba(90,0,20,0.25), inset 0 1px 1px rgba(255,255,255,0.9), inset 0 -2px 4px rgba(196,30,58,0.22);
+    transition: transform .3s cubic-bezier(.22,1,.36,1), box-shadow .3s ease, color .3s ease, background .3s ease, border-color .3s ease;
+  }
+  .theme-toggle:hover { transform: scale(1.07); }
+  .theme-toggle:active { transform: scale(0.93); }
+  .theme-toggle:focus-visible { outline: 2px solid var(--red-bright); outline-offset: 3px; }
+
+  .theme-toggle .ico {
+    position: absolute; width: 20px; height: 20px; pointer-events: none;
+    transition: transform .55s cubic-bezier(.22,1,.36,1), opacity .3s ease;
+  }
+  /* Sun: solid core with tapered rays */
+  .ico-sun { opacity: 0; transform: rotate(-90deg) scale(0.5); }
+  .ico-sun::before {
+    content: ''; position: absolute; inset: 6px; border-radius: 50%; background: currentColor;
+  }
+  .ico-sun::after {
+    content: ''; position: absolute; inset: 0;
+    background: repeating-conic-gradient(from -7deg, currentColor 0 14deg, transparent 14deg 45deg);
+    -webkit-mask: radial-gradient(circle closest-side, transparent 64%, #000 66%);
+    mask: radial-gradient(circle closest-side, transparent 64%, #000 66%);
+  }
+  /* Moon: crescent */
+  .ico-moon::before {
+    content: ''; position: absolute; inset: 2px; border-radius: 50%;
+    box-shadow: inset -5px -3px 0 0 currentColor;
+    transform: rotate(-25deg);
+  }
+  :root[data-theme="dark"] .ico-sun  { opacity: 1; transform: none; }
+  :root[data-theme="dark"] .ico-moon { opacity: 0; transform: rotate(90deg) scale(0.5); }
+
+  @media (max-width: 480px) {
+    .theme-toggle { top: 26px; right: 26px; width: 36px; height: 36px; }
+  }
+
+  /* ---------- Dark theme ---------- */
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --bg-light: #120D0C;
+    --glass-border: rgba(255,255,255,0.16);
+    --glass-highlight: rgba(255,255,255,0.4);
+    --glass-drop-shadow: 0 12px 40px rgba(0,0,0,0.5), 0 2px 8px rgba(0,0,0,0.35);
+    --glass-inner-shadow: inset 0 1px 1px rgba(255,255,255,0.18), inset 0 -1px 1px rgba(255,36,0,0.12);
+    --text-red: #F6A5AE;
+    --text-dark-red: #F7ECED;
+    --text-muted: #B4A6A7;
+    --frame-dark: #070304;
+    --frame-mid: #1d0910;
+    --liquid-surface:
+      radial-gradient(120% 55% at 12% 0%, rgba(255,255,255,0.12) 0%, transparent 60%),
+      linear-gradient(115deg, transparent 28%, rgba(255,255,255,0.10) 40%, rgba(255,255,255,0.02) 47%, transparent 58%),
+      radial-gradient(70% 45% at 92% 100%, rgba(255,36,0,0.22) 0%, transparent 70%),
+      radial-gradient(50% 35% at 0% 85%, rgba(196,30,58,0.18) 0%, transparent 70%),
+      var(--glass-noise),
+      rgba(18,7,10,0.58);
+    --liquid-rim:
+      inset 0 2px 2px rgba(255,255,255,0.30),
+      inset 0 -3px 5px rgba(255,36,0,0.18),
+      inset 0 0 0 1px rgba(255,255,255,0.12),
+      inset 0 0 46px rgba(255,255,255,0.05),
+      inset 14px 0 26px -14px rgba(255,255,255,0.22),
+      inset -14px 0 26px -14px rgba(255,36,0,0.22);
+  }
+
+  :root[data-theme="dark"] .glass-bg { background: #120D0C; }
+
+  :root[data-theme="dark"] .auth-card {
+    background:
+      radial-gradient(120% 55% at 12% 0%, rgba(255,255,255,0.12) 0%, transparent 60%),
+      linear-gradient(115deg, transparent 40%, rgba(255,255,255,0.16) 48%, rgba(255,255,255,0.03) 53%, transparent 60%),
+      radial-gradient(70% 45% at 92% 100%, rgba(255,36,0,0.22) 0%, transparent 70%),
+      radial-gradient(50% 35% at 0% 85%, rgba(196,30,58,0.18) 0%, transparent 70%),
+      var(--glass-noise),
+      rgba(18,7,10,0.58);
+    background-size: 100% 100%, 300% 100%, 100% 100%, 100% 100%, 160px 160px, 100% 100%;
+    background-repeat: no-repeat, no-repeat, no-repeat, no-repeat, repeat, no-repeat;
+  }
+  :root[data-theme="dark"] .auth-card,
+  :root[data-theme="dark"] .app-container {
+    border-color: rgba(255,255,255,0.22);
+    box-shadow: 0 22px 60px rgba(0,0,0,0.55), 0 2px 10px rgba(0,0,0,0.4), var(--liquid-rim);
+  }
+
+  :root[data-theme="dark"] .logo {
+    background: rgba(255,255,255,0.09);
+    color: #FF5A5F;
+    border: 1px solid rgba(255,255,255,0.22);
+  }
+  :root[data-theme="dark"] .auth-toggle {
+    background: rgba(255,255,255,0.06);
+    border-color: rgba(255,255,255,0.16);
+    box-shadow: inset 0 2px 3px rgba(255,255,255,0.08), inset 0 -2px 4px rgba(0,0,0,0.3);
+  }
+  :root[data-theme="dark"] .input-field {
+    background: rgba(255,255,255,0.06);
+    border-color: rgba(255,255,255,0.16);
+    color: var(--text-dark-red);
+    box-shadow: inset 0 2px 3px rgba(255,255,255,0.07), inset 0 -2px 4px rgba(0,0,0,0.25), inset 0 10px 16px -10px rgba(255,255,255,0.06);
+  }
+  :root[data-theme="dark"] .input-field:focus {
+    background: rgba(255,255,255,0.10);
+    border-color: var(--red-bright);
+    box-shadow: 0 0 0 4px rgba(255,36,0,0.18), 0 10px 24px -8px rgba(0,0,0,0.6), inset 0 2px 3px rgba(255,255,255,0.10);
+  }
+  :root[data-theme="dark"] .input-field:-webkit-autofill {
+    -webkit-text-fill-color: var(--text-dark-red);
+    transition: background-color 99999s ease-out 0s;
+  }
+  :root[data-theme="dark"] .secondary-action button { color: #FF5A4D; }
+  :root[data-theme="dark"] .logout-btn { background: rgba(255,90,100,0.12); color: #FF8A94; }
+  :root[data-theme="dark"] .logout-btn:hover { background: var(--red-deep); color: #fff; }
+  :root[data-theme="dark"] .theme-toggle {
+    color: #FFD9DC;
+    background:
+      radial-gradient(120% 90% at 20% 0%, rgba(255,255,255,0.20), transparent 60%),
+      rgba(255,255,255,0.06);
+    border-color: rgba(255,255,255,0.22);
+    box-shadow: 0 8px 22px rgba(0,0,0,0.5), inset 0 1px 1px rgba(255,255,255,0.3), inset 0 -2px 4px rgba(255,36,0,0.18);
+  }
+
+  .auth-title, .auth-subtitle, .toggle-btn, .input-field, .secondary-action, .powered-footer,
+  .logout-btn, .app-header { transition-property: color, background-color, border-color; transition-duration: .35s; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .theme-toggle, .theme-toggle .ico { transition: none !important; }
+  }
 </style>
 </head>
 <body>
@@ -747,6 +900,11 @@
 <canvas id="webgl-bg" aria-hidden="true"></canvas>
 <div class="glass-frame" aria-hidden="true"></div>
 
+<button type="button" class="theme-toggle" id="themeToggle" aria-label="Switch to dark mode" title="Switch to dark mode">
+  <span class="ico ico-moon" aria-hidden="true"></span>
+  <span class="ico ico-sun" aria-hidden="true"></span>
+</button>
+
 <!-- Floating R Orb after-image trail -->
 <div class="r-orb-echo" id="rOrbEcho0" style="opacity: 0.45;"></div>
 <div class="r-orb-echo" id="rOrbEcho1" style="opacity: 0.32;"></div>
@@ -758,7 +916,7 @@
 <div class="floating-r-orb" id="rOrb">R</div>
 
 <!-- ===================================================================== -->
-<!-- ⚠️ IMPORTANT NOTICE TO FUTURE DEVELOPERS ⚠️                            -->
+<!-- IMPORTANT NOTICE TO FUTURE DEVELOPERS                                -->
 <!-- The Supabase integration below is STRICTLY FOR AUTHENTICATION ONLY.   -->
 <!-- It handles user Login and Registration via Edge Functions.            -->
 <!-- DO NOT mistake this for a general database. All other app data        -->
@@ -851,6 +1009,7 @@
       'uniform vec2 u_res;',
       'uniform float u_time;',
       'uniform vec2 u_mouse;',
+      'uniform float u_dark;',
 
       'float hash(vec2 p) { return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453123); }',
 
@@ -872,7 +1031,7 @@
       '  vec2 uv = gl_FragCoord.xy / u_res;',
       '  vec2 st = uv * vec2(u_res.x / u_res.y, 1.0);',
       '  vec2 m = (u_mouse / u_res) * vec2(u_res.x / u_res.y, 1.0);',
-      '  float t = u_time * 0.035;',
+      '  float t = u_time * 0.045;',
 
       '  vec2 d = st - m;',
       '  float pull = exp(-dot(d, d) * 3.0) * 0.5;',
@@ -882,13 +1041,16 @@
       '                fbm(st + 4.0 * q + vec2(8.3, 2.8) - t * 1.5));',
       '  float f = fbm(st + 4.0 * r + pull);',
 
-      '  vec3 paper = vec3(0.941, 0.949, 0.961);',
-      '  vec3 blush = vec3(0.976, 0.870, 0.880);',
-      '  vec3 crimson = vec3(0.769, 0.118, 0.227);',
+      '  vec3 cA = mix(vec3(0.945, 0.950, 0.962), vec3(0.060, 0.042, 0.042), u_dark);',
+      '  vec3 cB = mix(vec3(0.985, 0.780, 0.805), vec3(0.360, 0.070, 0.120), u_dark);',
+      '  vec3 cC = mix(vec3(0.800, 0.105, 0.225), vec3(0.860, 0.210, 0.270), u_dark);',
 
-      '  vec3 col = mix(paper, blush, smoothstep(0.30, 0.75, f));',
-      '  col = mix(col, crimson, smoothstep(0.55, 0.95, f) * smoothstep(0.15, 0.65, length(q)) * 0.30);',
-      '  col += vec3(0.02, 0.0, 0.0) * pull;',
+      '  vec3 col = mix(cA, cB, smoothstep(0.25, 0.78, f));',
+      '  float k = smoothstep(0.48, 0.90, f) * smoothstep(0.10, 0.60, length(q));',
+      '  col = mix(col, cC, k * mix(0.50, 0.85, u_dark));',
+      '  col += vec3(0.05, 0.01, 0.015) * pull * (0.4 + u_dark);',
+      '  float vg = smoothstep(1.4, 0.2, distance(uv, vec2(0.5)));',
+      '  col *= mix(1.0, 0.70 + 0.30 * vg, u_dark);',
 
       '  col += (hash(gl_FragCoord.xy + fract(u_time)) - 0.5) / 255.0;',
       '  gl_FragColor = vec4(col, 1.0);',
@@ -923,6 +1085,7 @@
     var uRes = gl.getUniformLocation(prog, 'u_res');
     var uTime = gl.getUniformLocation(prog, 'u_time');
     var uMouse = gl.getUniformLocation(prog, 'u_mouse');
+    var uDark = gl.getUniformLocation(prog, 'u_dark');
 
     // The field is soft, so a reduced-resolution buffer looks identical and stays cheap.
     var SCALE = 0.5;
@@ -940,29 +1103,59 @@
       ty = 1 - e.clientY / window.innerHeight;
     });
 
+    var root = document.documentElement;
+    function themeTarget() { return root.getAttribute('data-theme') === 'dark' ? 1 : 0; }
+    var dk = themeTarget();
+
     var t0 = performance.now();
     function frame() {
-      mx += (tx - mx) * 0.05;
-      my += (ty - my) * 0.05;
       gl.uniform2f(uRes, canvas.width, canvas.height);
       gl.uniform1f(uTime, (performance.now() - t0) / 1000);
       gl.uniform2f(uMouse, mx * canvas.width, my * canvas.height);
+      gl.uniform1f(uDark, dk);
       gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
     }
 
     var still = window.matchMedia('(prefers-reduced-motion: reduce)');
     var raf = 0;
-    function loop() { frame(); raf = requestAnimationFrame(loop); }
-    function start() { cancelAnimationFrame(raf); if (still.matches) frame(); else loop(); }
+    function loop() {
+      mx += (tx - mx) * 0.05;
+      my += (ty - my) * 0.05;
+      dk += (themeTarget() - dk) * 0.1;
+      frame();
+      raf = requestAnimationFrame(loop);
+    }
+    function start() { cancelAnimationFrame(raf); if (still.matches) { dk = themeTarget(); frame(); } else loop(); }
     still.addEventListener('change', start);
     window.addEventListener('resize', function () { if (still.matches) frame(); });
+    new MutationObserver(function () { if (still.matches) { dk = themeTarget(); frame(); } })
+      .observe(root, { attributes: true, attributeFilter: ['data-theme'] });
     start();
   })();
 </script>
 
 <script>
+  (function () {
+    var root = document.documentElement;
+    var btn = document.getElementById('themeToggle');
+    function sync() {
+      var label = root.getAttribute('data-theme') === 'dark' ? 'Switch to light mode' : 'Switch to dark mode';
+      btn.setAttribute('aria-label', label);
+      btn.title = label;
+    }
+    btn.addEventListener('click', function () {
+      var next = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      root.setAttribute('data-theme', next);
+      try { localStorage.setItem('recall-theme', next); } catch (e) {}
+      sync();
+    });
+    sync();
+  })();
+</script>
+
+<script>
   // =====================================================================
-  // ⚠️ SUPABASE AUTH CONFIGURATION ⚠️
+  // SUPABASE AUTH CONFIGURATION 
   // This API endpoint is ONLY for user authentication (Login/Register).
   // Do not use this for fetching or saving app data. 
   // =====================================================================

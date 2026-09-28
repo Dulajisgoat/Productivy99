@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Recall — Access</title>
+<title>Recall prototype</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -88,10 +88,9 @@
 
   /* Auth Card (Apple Liquid Glass Interface) */
   .auth-card {
-    background: rgba(255, 255, 255, 0.25); /* Translucent so the orb is visible underneath */
+    background: rgba(255, 255, 255, 0.25);
     backdrop-filter: blur(var(--glass-blur-heavy)) saturate(180%);
     -webkit-backdrop-filter: blur(var(--glass-blur-heavy)) saturate(180%);
-    /* SVG displacement filter added inline in HTML for that liquid refraction look */
     border: 1px solid var(--glass-border);
     border-radius: 32px;
     padding: 48px 40px;
@@ -235,9 +234,13 @@
     position: relative;
   }
 
+  .input-wrapper {
+    position: relative;
+  }
+
   .input-field {
     width: 100%;
-    padding: 16px 20px;
+    padding: 16px 48px 16px 20px; /* Added right padding for toggle */
     background: rgba(255, 255, 255, 0.4);
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
@@ -261,6 +264,64 @@
     font-weight: 400;
   }
 
+  /* Autofill fix */
+  .input-field:-webkit-autofill,
+  .input-field:-webkit-autofill:hover,
+  .input-field:-webkit-autofill:focus {
+    -webkit-text-fill-color: var(--text-dark-red);
+    -webkit-box-shadow: 0 0 0 1000px rgba(255, 255, 255, 0.6) inset;
+    transition: background-color 9999s ease-out 0s;
+  }
+
+  :root[data-theme="dark"] .input-field:-webkit-autofill,
+  :root[data-theme="dark"] .input-field:-webkit-autofill:hover,
+  :root[data-theme="dark"] .input-field:-webkit-autofill:focus {
+    -webkit-box-shadow: 0 0 0 1000px rgba(255, 255, 255, 0.1) inset;
+  }
+
+  /* Password Toggle Eye Icon */
+  .pw-toggle-btn {
+    position: absolute;
+    right: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: var(--text-muted);
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.2s ease;
+  }
+  .pw-toggle-btn:hover { color: var(--red-deep); }
+  .pw-toggle-btn svg { width: 20px; height: 20px; pointer-events: none; }
+
+  /* Form Options (Remember Me) */
+  .form-options {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    font-size: 13px;
+    margin-top: -8px;
+  }
+  .remember-me {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    color: var(--text-red);
+    opacity: 0.9;
+    user-select: none;
+  }
+  .remember-me input {
+    width: 16px;
+    height: 16px;
+    accent-color: var(--red-deep);
+    cursor: pointer;
+  }
+
   /* Submit Button */
   .submit-btn {
     width: 100%;
@@ -279,6 +340,10 @@
     box-shadow: 0 8px 24px rgba(196, 20, 58, 0.3);
     margin-top: 8px;
     letter-spacing: 0.02em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
   }
 
   .submit-btn:hover {
@@ -290,6 +355,12 @@
     transform: translateY(0);
   }
 
+  .submit-btn:disabled {
+    cursor: not-allowed;
+    opacity: 0.7;
+    transform: none;
+  }
+
   .submit-btn::before {
     content: '';
     position: absolute;
@@ -297,6 +368,18 @@
     background: linear-gradient(180deg, rgba(255,255,255,0.2) 0%, transparent 100%);
     pointer-events: none;
   }
+
+  /* CSS Spinner */
+  .spinner {
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: spin 0.6s linear infinite;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
 
   /* Secondary Action */
   .secondary-action {
@@ -331,19 +414,6 @@
   .form-section.active {
     display: block;
     animation: fadeIn 0.5s ease forwards;
-  }
-
-  .hidden-field {
-    max-height: 0;
-    overflow: hidden;
-    opacity: 0;
-    transition: max-height 0.5s ease, opacity 0.3s ease, margin 0.3s ease;
-    margin: 0;
-  }
-
-  .hidden-field.visible {
-    max-height: 80px;
-    opacity: 1;
   }
 
   /* Auth Message Box */
@@ -480,7 +550,7 @@
     font-weight: 700;
     color: #fff;
     text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
-    z-index: 0; /* Kept at 0 so the glass card sits on top and blurs it */
+    z-index: 0;
     pointer-events: none;
     transition: background 0.15s ease, box-shadow 0.15s ease;
   }
@@ -490,7 +560,6 @@
     box-shadow: 0 0 60px rgba(0, 255, 0, 0.7), 0 0 100px rgba(0, 255, 0, 0.4);
   }
 
-  /* After-image trail for the Floating "R" Orb - matches its glow/gradient */
   .r-orb-echo {
     position: fixed;
     top: 0;
@@ -514,7 +583,6 @@
 
   /* ========================================================= */
   /* REDESIGN: Visible liquid-glass texture + dark glass frame  */
-  /* (additive overrides - layout, logic and motion unchanged)  */
   /* ========================================================= */
   :root {
     --frame-dark: #14050a;
@@ -536,7 +604,6 @@
       inset -14px 0 26px -14px rgba(255,36,0,0.22);
   }
 
-  /* Dark glass frame around the screen edges */
   .glass-frame {
     position: fixed;
     inset: 0;
@@ -544,7 +611,7 @@
     pointer-events: none;
     overflow: hidden;
   }
-  .glass-frame::before {           /* rounded glass "window" + dark bezel */
+  .glass-frame::before {
     content: '';
     position: absolute;
     inset: 16px;
@@ -556,7 +623,7 @@
       0 0 0 9px var(--frame-mid),
       0 0 0 100vmax var(--frame-dark);
   }
-  .glass-frame::after {            /* reeded (ribbed) glass + red sheen on the bezel */
+  .glass-frame::after {
     content: '';
     position: absolute;
     inset: 0;
@@ -569,7 +636,6 @@
     mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
   }
 
-  /* Card + app panel: more visible liquid glass */
   .auth-card,
   .app-container {
     background: var(--liquid-surface);
@@ -589,7 +655,6 @@
     box-shadow: inset 0 2px 3px rgba(255,255,255,0.85), inset 0 -2px 4px rgba(196,30,58,0.12), inset 0 10px 16px -10px rgba(255,255,255,0.7);
   }
 
-  /* Floating "R" orb: same size/motion, now a glass sphere */
   .floating-r-orb {
     background:
       radial-gradient(circle at 30% 24%, rgba(255,255,255,0.9) 0 5%, rgba(255,255,255,0) 26%),
@@ -603,7 +668,6 @@
     box-shadow: 0 0 60px rgba(0,255,0,0.7), 0 0 100px rgba(0,255,0,0.4), inset 0 2px 5px rgba(255,255,255,0.4), inset 0 -6px 12px rgba(0,60,0,0.5), inset 0 0 0 1px rgba(255,255,255,0.45);
   }
 
-  /* After-image trail: glass ghosts of the orb */
   .r-orb-echo {
     background:
       radial-gradient(circle at 30% 24%, rgba(255,255,255,0.7) 0 5%, rgba(255,255,255,0) 26%),
@@ -623,15 +687,13 @@
   }
 
   /* ========================================================= */
-  /* REDESIGN v3: sleek minimal look, new type, motion, smaller card */
-  /* (additive overrides only - login logic, orb and frame kept)   */
+  /* REDESIGN v3: sleek minimal look, new type, motion          */
   /* ========================================================= */
   :root {
     --font-display: 'Sora', 'Manrope', -apple-system, 'Segoe UI', sans-serif;
     --font-body: 'DM Sans', 'Manrope', -apple-system, 'Segoe UI', sans-serif;
   }
 
-  /* Type */
   body, .auth-subtitle, .input-field, .secondary-action, .secondary-action button,
   .auth-message, .powered-footer { font-family: var(--font-body); }
   .auth-title, .toggle-btn, .submit-btn, .logo, .user-avatar, .logout-btn,
@@ -641,13 +703,11 @@
   .toggle-btn, .submit-btn { letter-spacing: 0.01em; }
   .input-field { letter-spacing: 0.005em; }
 
-  /* Smaller login card (tighter edges, same text sizes) */
   .auth-card { max-width: 380px; padding: 34px 30px; border-radius: 30px; }
   @media (max-width: 480px) { .auth-card { padding: 28px 22px; } }
 
   .glass-frame::after { animation: frameGlow 7s ease-in-out infinite; }
 
-  /* Card: entrance + slow liquid sheen sweep */
   .auth-card {
     background:
       radial-gradient(120% 55% at 12% 0%, rgba(255,255,255,0.65) 0%, transparent 60%),
@@ -661,10 +721,9 @@
     animation: fadeUp 0.8s cubic-bezier(0.25, 1, 0.5, 1) forwards, liquidSheen 9s ease-in-out 1s infinite;
   }
 
-  /* Staggered reveal of the card contents */
   .auth-content > .auth-title, .auth-content > .auth-subtitle, .auth-content > .auth-toggle,
   .auth-content > .secondary-action, .auth-content > .powered-footer,
-  .form-section.active .input-group, .form-section.active .submit-btn {
+  .form-section.active .input-group, .form-section.active .submit-btn, .form-section.active .form-options {
     animation: riseIn 0.7s cubic-bezier(0.22, 1, 0.36, 1) backwards;
   }
   .auth-content > .auth-title { animation-delay: 0.30s; }
@@ -672,14 +731,13 @@
   .auth-content > .auth-toggle { animation-delay: 0.46s; }
   .form-section.active .input-group:nth-child(1) { animation-delay: 0.10s; }
   .form-section.active .input-group:nth-child(2) { animation-delay: 0.18s; }
-  .form-section.active .submit-btn { animation-delay: 0.26s; }
+  .form-section.active .form-options { animation-delay: 0.24s; }
+  .form-section.active .submit-btn { animation-delay: 0.28s; }
   .auth-content > .secondary-action { animation-delay: 0.62s; }
   .auth-content > .powered-footer { animation-delay: 0.70s; }
 
-  /* Logo: pop-in, float, pulsing glow */
   .logo { animation: logoPop 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) 0.15s backwards, logoFloat 5s ease-in-out 1s infinite; }
 
-  /* Buttons + inputs: alive but calm */
   .submit-btn::after {
     content: ''; position: absolute; top: 0; bottom: 0; left: -60%; width: 40%;
     background: linear-gradient(105deg, transparent, rgba(255,255,255,0.45), transparent);
@@ -710,17 +768,13 @@
     .submit-btn::after, .auth-content > *, .form-section.active .input-group, .form-section.active .submit-btn { animation: none !important; }
   }
 
-  /* ========================================================= */
-  /* FIT-TO-SCREEN: frame + card always sit inside the viewport   */
-  /* ========================================================= */
   .glass-frame { inset: auto; top: 0; left: 0; width: 100%; height: 100vh; height: 100dvh; }
   body {
     min-height: 100vh; min-height: 100dvh;
-    padding: 34px;               /* bezel (16) + ring (9) + gap (9): content never touches the borders */
+    padding: 34px;
   }
   @media (max-width: 480px) { body { padding: 26px; } }
 
-  /* On shorter screens, tighten spacing (not font sizes) so the whole card fits inside the borders */
   @media (max-height: 760px) {
     .auth-card { padding: 24px 28px; }
     .logo { width: 60px; height: 60px; margin-bottom: 18px; }
@@ -742,7 +796,7 @@
   }
 
   /* ========================================================= */
-  /* THEMES: light (default) + dark. Liquid glass kept in both. */
+  /* THEMES: light (default) + dark. Liquid glass kept in both */
   /* ========================================================= */
   :root { color-scheme: light; }
 
@@ -768,7 +822,6 @@
     position: absolute; width: 20px; height: 20px; pointer-events: none;
     transition: transform .55s cubic-bezier(.22,1,.36,1), opacity .3s ease;
   }
-  /* Sun: solid core with tapered rays */
   .ico-sun { opacity: 0; transform: rotate(-90deg) scale(0.5); }
   .ico-sun::before {
     content: ''; position: absolute; inset: 6px; border-radius: 50%; background: currentColor;
@@ -779,7 +832,6 @@
     -webkit-mask: radial-gradient(circle closest-side, transparent 64%, #000 66%);
     mask: radial-gradient(circle closest-side, transparent 64%, #000 66%);
   }
-  /* Moon: crescent */
   .ico-moon::before {
     content: ''; position: absolute; inset: 2px; border-radius: 50%;
     box-shadow: inset -5px -3px 0 0 currentColor;
@@ -888,7 +940,7 @@
 <body>
 
 <!-- SVG Liquid Glass Displacement Filter -->
-<svg style="position: absolute; width: 0; height: 0; overflow: hidden;">
+<svg style="position: absolute; width: 0; height: 0; overflow: hidden;" aria-hidden="true">
   <filter id="liquid-glass" x="-20%" y="-20%" width="140%" height="140%">
     <feTurbulence type="fractalNoise" baseFrequency="0.008 0.012" numOctaves="2" seed="92" result="noise" />
     <feGaussianBlur in="noise" stdDeviation="2" result="blurred" />
@@ -896,7 +948,7 @@
   </filter>
 </svg>
 
-<div class="glass-bg"></div>
+<div class="glass-bg" aria-hidden="true"></div>
 <canvas id="webgl-bg" aria-hidden="true"></canvas>
 <div class="glass-frame" aria-hidden="true"></div>
 
@@ -906,14 +958,14 @@
 </button>
 
 <!-- Floating R Orb after-image trail -->
-<div class="r-orb-echo" id="rOrbEcho0" style="opacity: 0.45;"></div>
-<div class="r-orb-echo" id="rOrbEcho1" style="opacity: 0.32;"></div>
-<div class="r-orb-echo" id="rOrbEcho2" style="opacity: 0.20;"></div>
-<div class="r-orb-echo" id="rOrbEcho3" style="opacity: 0.11;"></div>
-<div class="r-orb-echo" id="rOrbEcho4" style="opacity: 0.05;"></div>
+<div class="r-orb-echo" id="rOrbEcho0" style="opacity: 0.45;" aria-hidden="true"></div>
+<div class="r-orb-echo" id="rOrbEcho1" style="opacity: 0.32;" aria-hidden="true"></div>
+<div class="r-orb-echo" id="rOrbEcho2" style="opacity: 0.20;" aria-hidden="true"></div>
+<div class="r-orb-echo" id="rOrbEcho3" style="opacity: 0.11;" aria-hidden="true"></div>
+<div class="r-orb-echo" id="rOrbEcho4" style="opacity: 0.05;" aria-hidden="true"></div>
 
 <!-- Floating R Orb -->
-<div class="floating-r-orb" id="rOrb">R</div>
+<div class="floating-r-orb" id="rOrb" aria-hidden="true">R</div>
 
 <!-- ===================================================================== -->
 <!-- IMPORTANT NOTICE TO FUTURE DEVELOPERS                                -->
@@ -928,39 +980,61 @@
   <div class="auth-content">
     
     <!-- R Logo with white background -->
-    <div class="logo">R</div>
+    <div class="logo" aria-hidden="true">R</div>
     
     <h1 class="auth-title" id="formTitle">Welcome Back</h1>
     <p class="auth-subtitle" id="formSubtitle">Sign in to continue your learning</p>
     
     <!-- Toggle Switch -->
-    <div class="auth-toggle">
+    <div class="auth-toggle" role="tablist">
       <div class="toggle-slider" id="toggleSlider"></div>
-      <button class="toggle-btn active" id="loginBtn">Sign In</button>
-      <button class="toggle-btn" id="signupBtn">Sign Up</button>
+      <button class="toggle-btn active" id="loginBtn" role="tab" aria-selected="true">Sign In</button>
+      <button class="toggle-btn" id="signupBtn" role="tab" aria-selected="false">Sign Up</button>
     </div>
     
     <!-- Login Form -->
     <form class="auth-form form-section active" id="loginForm">
       <div class="input-group">
-        <input type="text" class="input-field" id="loginUsername" placeholder="Username" required>
+        <div class="input-wrapper">
+          <input type="text" class="input-field" id="loginUsername" placeholder="Username" aria-label="Username" required autofocus>
+        </div>
       </div>
       <div class="input-group">
-        <input type="password" class="input-field" id="loginPassword" placeholder="Password" required>
+        <div class="input-wrapper">
+          <input type="password" class="input-field" id="loginPassword" placeholder="Password" aria-label="Password" required>
+          <button type="button" class="pw-toggle-btn" data-target="loginPassword" aria-label="Toggle password visibility">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>
+        </div>
       </div>
-      <div class="auth-message" id="loginMessage"></div>
+      
+      <div class="form-options">
+        <label class="remember-me">
+          <input type="checkbox" id="rememberMe" checked>
+          Remember me
+        </label>
+      </div>
+      
+      <div class="auth-message" id="loginMessage" role="status" aria-live="polite"></div>
       <button type="submit" class="submit-btn" id="loginSubmit">Sign In</button>
     </form>
     
     <!-- Sign Up Form -->
     <form class="auth-form form-section" id="signupForm">
       <div class="input-group">
-        <input type="text" class="input-field" id="signupUsername" placeholder="Username" required>
+        <div class="input-wrapper">
+          <input type="text" class="input-field" id="signupUsername" placeholder="Username" aria-label="Username" required>
+        </div>
       </div>
       <div class="input-group">
-        <input type="password" class="input-field" id="signupPassword" placeholder="Create Password" required>
+        <div class="input-wrapper">
+          <input type="password" class="input-field" id="signupPassword" placeholder="Create Password" aria-label="Create Password" required>
+          <button type="button" class="pw-toggle-btn" data-target="signupPassword" aria-label="Toggle password visibility">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>
+        </div>
       </div>
-      <div class="auth-message" id="signupMessage"></div>
+      <div class="auth-message" id="signupMessage" role="status" aria-live="polite"></div>
       <button type="submit" class="submit-btn" id="signupSubmit">Create Account</button>
     </form>
     
@@ -1087,7 +1161,6 @@
     var uMouse = gl.getUniformLocation(prog, 'u_mouse');
     var uDark = gl.getUniformLocation(prog, 'u_dark');
 
-    // The field is soft, so a reduced-resolution buffer looks identical and stays cheap.
     var SCALE = 0.5;
     function resize() {
       canvas.width = Math.max(1, Math.round(window.innerWidth * SCALE));
@@ -1157,14 +1230,13 @@
   // =====================================================================
   // SUPABASE AUTH CONFIGURATION 
   // This API endpoint is ONLY for user authentication (Login/Register).
-  // Do not use this for fetching or saving app data. 
   // =====================================================================
   const SUPABASE_FUNCTIONS_URL = 'https://lbujqhnadkwqgojbhalw.supabase.co/functions/v1';
   
   function getApiUrl(action) {
     return (action === 'login' || action === 'register')
       ? `${SUPABASE_FUNCTIONS_URL}/auth`
-      : `${SUPABASE_FUNCTIONS_URL}/manage-organizations`; // Left intact for routing consistency, but unused in this stripped UI
+      : `${SUPABASE_FUNCTIONS_URL}/manage-organizations`;
   }
 
   /* ---------- UI Element References ---------- */
@@ -1178,11 +1250,36 @@
   const secondaryText = document.getElementById('secondaryText');
   const switchModeBtn = document.getElementById('switchModeBtn');
 
+  /* ---------- Password Visibility Toggle ---------- */
+  document.querySelectorAll('.pw-toggle-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+      const targetId = this.dataset.target;
+      const input = document.getElementById(targetId);
+      if (input.type === 'password') {
+        input.type = 'text';
+        this.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>';
+      } else {
+        input.type = 'password';
+        this.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>';
+      }
+    });
+  });
+
+  /* ---------- Enter Key Navigation ---------- */
+  document.getElementById('loginUsername').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') { e.preventDefault(); document.getElementById('loginPassword').focus(); }
+  });
+  document.getElementById('signupUsername').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') { e.preventDefault(); document.getElementById('signupPassword').focus(); }
+  });
+
   /* ---------- UI Toggle Logic ---------- */
   function switchMode(mode) {
     if (mode === 'login') {
       loginBtnTab.classList.add('active');
+      loginBtnTab.setAttribute('aria-selected', 'true');
       signupBtnTab.classList.remove('active');
+      signupBtnTab.setAttribute('aria-selected', 'false');
       toggleSlider.classList.remove('right');
       loginForm.classList.add('active');
       signupForm.classList.remove('active');
@@ -1190,9 +1287,12 @@
       formSubtitle.textContent = 'Sign in to continue your learning';
       secondaryText.textContent = "Don't have an account?";
       switchModeBtn.textContent = 'Sign up';
+      document.getElementById('loginUsername').focus();
     } else {
       signupBtnTab.classList.add('active');
+      signupBtnTab.setAttribute('aria-selected', 'true');
       loginBtnTab.classList.remove('active');
+      loginBtnTab.setAttribute('aria-selected', 'false');
       toggleSlider.classList.add('right');
       signupForm.classList.add('active');
       loginForm.classList.remove('active');
@@ -1200,6 +1300,7 @@
       formSubtitle.textContent = 'Start your learning journey today';
       secondaryText.textContent = 'Already have an account?';
       switchModeBtn.textContent = 'Sign in';
+      document.getElementById('signupUsername').focus();
     }
   }
 
@@ -1218,20 +1319,25 @@
   }
 
   /* ---------- Session Management ---------- */
-  function getStoredSession() {
-    try {
-      const userId = localStorage.getItem('userId');
-      const username = localStorage.getItem('username');
-      const authToken = localStorage.getItem('authToken');
-      if (userId && username && authToken) return { userId, username, authToken };
-    } catch {}
-    return null;
-  }
-
+  // Clears both local and session storage to avoid conflicts
   function clearSession() {
     localStorage.removeItem('userId');
     localStorage.removeItem('username');
     localStorage.removeItem('authToken');
+    sessionStorage.removeItem('userId');
+    sessionStorage.removeItem('username');
+    sessionStorage.removeItem('authToken');
+  }
+
+  function getStoredSession() {
+    try {
+      // Check sessionStorage first (non-remembered), then localStorage (remembered)
+      const userId = sessionStorage.getItem('userId') || localStorage.getItem('userId');
+      const username = sessionStorage.getItem('username') || localStorage.getItem('username');
+      const authToken = sessionStorage.getItem('authToken') || localStorage.getItem('authToken');
+      if (userId && username && authToken) return { userId, username, authToken };
+    } catch {}
+    return null;
   }
 
   function enterApp() {
@@ -1247,6 +1353,47 @@
   function showLogin() {
     document.getElementById('appContainer').style.display = 'none';
     document.getElementById('authCard').style.display = 'block';
+    document.getElementById('loginUsername').focus();
+  }
+
+  /* ---------- Global Fetch Wrapper (Session Expiration Handler) ---------- */
+  async function apiFetch(url, options) {
+    try {
+      const response = await fetch(url, options);
+      // Catch 401 Unauthorized globally
+      if (response.status === 401) {
+        clearSession();
+        showLogin();
+        showMessage('loginMessage', 'Session expired. Please sign in again.');
+        throw new Error('Unauthorized');
+      }
+      return response;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  /* ---------- Rate Limiting ---------- */
+  let loginAttempts = 0;
+  let isRateLimited = false;
+
+  function startRateLimit() {
+    isRateLimited = true;
+    let countdown = 60;
+    const submitBtn = document.getElementById('loginSubmit');
+    submitBtn.disabled = true;
+    
+    const interval = setInterval(() => {
+      submitBtn.textContent = `Try again in ${countdown}s`;
+      countdown--;
+      if (countdown < 0) {
+        clearInterval(interval);
+        isRateLimited = false;
+        loginAttempts = 0;
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Sign In';
+      }
+    }, 1000);
   }
 
   /* ---------- Auth API Calls ---------- */
@@ -1257,6 +1404,11 @@
     const messageEl = isLogin ? 'loginMessage' : 'signupMessage';
     const submitBtn = document.getElementById(isLogin ? 'loginSubmit' : 'signupSubmit');
 
+    if (isRateLimited) {
+      showMessage(messageEl, 'Too many attempts. Please wait.');
+      return;
+    }
+
     if (!username || !password) {
       showMessage(messageEl, 'Please enter both username and password');
       return;
@@ -1264,10 +1416,10 @@
 
     showMessage(messageEl, 'Processing...', 'loading');
     submitBtn.disabled = true;
-    submitBtn.textContent = 'Loading...';
+    submitBtn.innerHTML = '<div class="spinner"></div> Loading...';
 
     try {
-      const response = await fetch(getApiUrl(action), {
+      const response = await apiFetch(getApiUrl(action), {
         method: 'POST',
         mode: 'cors',
         headers: { 'Content-Type': 'application/json' },
@@ -1277,20 +1429,42 @@
       const data = await response.json();
 
       if (!response.ok) {
+        if (isLogin) {
+          loginAttempts++;
+          if (loginAttempts >= 3) {
+            showMessage(messageEl, 'Too many failed attempts. Rate limit activated.');
+            startRateLimit();
+            return;
+          }
+        }
         showMessage(messageEl, `HTTP ${response.status}: ${data.error || 'Server error'}`);
         return;
       }
 
       if (data.success) {
+        loginAttempts = 0; // Reset on success
         showMessage(messageEl, 
           action === 'register' ? 'Account created — welcome to Recall' : 'Welcome back to Recall', 
           'success'
         );
-        localStorage.setItem('userId', data.userId);
-        localStorage.setItem('username', data.username);
-        localStorage.setItem('authToken', data.token);
+
+        // Determine storage based on "Remember Me" checkbox (only applies to login)
+        const storage = (isLogin && document.getElementById('rememberMe').checked) ? localStorage : sessionStorage;
+        
+        storage.setItem('userId', data.userId);
+        storage.setItem('username', data.username);
+        storage.setItem('authToken', data.token);
+        
+        // If registering, assume they want to be remembered
+        if (!isLogin) {
+          localStorage.setItem('userId', data.userId);
+          localStorage.setItem('username', data.username);
+          localStorage.setItem('authToken', data.token);
+        }
+
         setTimeout(() => enterApp(), 700);
       } else {
+        if (isLogin) loginAttempts++;
         showMessage(messageEl, data.error || 'Authentication failed');
       }
     } catch (error) {
@@ -1317,8 +1491,6 @@
 
   // =====================================================================
   // Floating "R" Orb Logic
-  // Moves smoothly in a specific continuous figure-8 (lemniscate) pattern.
-  // Has a 1/100 chance per cycle pass to briefly flash green.
   // =====================================================================
   (function initROrb() {
     const rOrb = document.getElementById('rOrb');
@@ -1329,7 +1501,7 @@
       document.getElementById('rOrbEcho3'),
       document.getElementById('rOrbEcho4')
     ];
-    const echoDelaySteps = 3; // frames of gap between each echo
+    const echoDelaySteps = 3; 
     const posHistory = [];
     const posHistoryMax = echoDelaySteps * echoes.length + 1;
     let time = 0;
@@ -1344,19 +1516,14 @@
       const centerX = w / 2;
       const centerY = h / 2;
       
-      // Specific Pattern: Figure-8 (Lemniscate of Gerono)
-      // x = A * cos(t), y = B * sin(2t) / 2
-      // This creates a continuous smooth "specific pattern" rotation around the center
       const radiusX = w * 0.35;
       const radiusY = h * 0.3;
       
       const x = centerX + radiusX * Math.cos(time);
       const y = centerY + radiusY * Math.sin(2 * time) / 2;
       
-      // Update Orb Position
       rOrb.style.transform = `translate(${x}px, ${y}px)`;
 
-      // Record position history and update the after-image trail
       posHistory.unshift({ x, y });
       if (posHistory.length > posHistoryMax) posHistory.length = posHistoryMax;
 
@@ -1366,13 +1533,10 @@
         if (p) echo.style.transform = `translate(${p.x}px, ${p.y}px)`;
       });
       
-      // Check for flash chance when the orb completes a full "loop" (passing the center)
-      // cos(t) is close to 0 when t is near pi/2 or 3pi/2 (the center cross of the 8)
       const cycleMod = time % Math.PI;
       if (cycleMod > Math.PI / 2 - 0.05 && cycleMod < Math.PI / 2 + 0.05 && time > nextFlashChance) {
-        nextFlashChance = time + Math.PI - 0.1; // Wait until the next pass to check again
+        nextFlashChance = time + Math.PI - 0.1; 
         
-        // 1 in 100 chance
         if (Math.floor(Math.random() * 100) === 0) {
           flashState = true;
           flashStartTime = time;
@@ -1381,7 +1545,6 @@
         }
       }
       
-      // If flashing, wait ~0.5 seconds before going back to continuing the rotation
       if (flashState && time > flashStartTime + 0.5) {
         flashState = false;
         rOrb.classList.remove('flash');

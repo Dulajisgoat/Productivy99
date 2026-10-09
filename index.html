@@ -389,12 +389,8 @@ ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:12p
 
     <form class="form-panel active" id="panelSignup" novalidate>
       <div>
-        <label for="suName">Name</label>
-        <input type="text" id="suName" required autocomplete="name">
-      </div>
-      <div>
-        <label for="suEmail">Email</label>
-        <input type="email" id="suEmail" required autocomplete="email">
+        <label for="suName">Username</label>
+        <input type="text" id="suName" required autocomplete="username">
       </div>
       <div>
         <label for="suPassword">Password</label>
@@ -410,8 +406,8 @@ ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:12p
 
     <form class="form-panel" id="panelLogin" novalidate>
       <div>
-        <label for="liEmail">Email</label>
-        <input type="email" id="liEmail" required autocomplete="email">
+        <label for="liEmail">Username</label>
+        <input type="text" id="liEmail" required autocomplete="username">
       </div>
       <div>
         <label for="liPassword">Password</label>
@@ -421,7 +417,7 @@ ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:12p
       <button type="submit" class="btn btn-solid">Log in</button>
     </form>
 
-    <div class="modal-note">Accounts are stored in this browser only — this is a front-end demo, not a connected backend.</div>
+    <div class="modal-note">Pick a username and password — no email needed.</div>
   </div>
 </div>
 
@@ -522,7 +518,7 @@ ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:12p
       workspace.style.display = '';
       authButtons.style.display = 'none';
       accountChip.style.display = 'flex';
-      accountName.textContent = profile.name;
+      accountName.textContent = profile.username;
       navFeatures.style.display = 'none';
       navWorkspace.style.display = '';
     } else {
@@ -575,7 +571,7 @@ $('clkBtn').addEventListener('click',function(){var t=$('trk');if(tm){clearInter
 /* posts */
 async function loadPosts(){var r=await sb.from('posts').select('*').order('created_at',{ascending:false});if(r.error)console.error(r.error);else posts=r.data||[];drawFeed()}
 function drawFeed(){$('feed').innerHTML=posts.map(function(p){return '<li class="post"><small><b>'+esc(p.name)+'</b><span class="badge">'+esc(p.role)+'</span></small><p>'+esc(p.content)+'</p><button class="like" data-id="'+p.id+'">&#9825; '+p.likes+'</button></li>'}).join('')||'<li class="empty">No posts yet. Start the conversation.</li>'}
-$('postForm').addEventListener('submit',async function(e){e.preventDefault();var v=$('postIn').value.trim();if(!v)return;if(!need())return;var r=await sb.from('posts').insert({profile_id:pid(),name:P99.profile.name||'Guest',role:$('postRole').value,content:v,likes:0});if(bad(r))return;$('postIn').value='';loadPosts()});
+$('postForm').addEventListener('submit',async function(e){e.preventDefault();var v=$('postIn').value.trim();if(!v)return;if(!need())return;var r=await sb.from('posts').insert({profile_id:pid(),name:P99.profile.username||'Guest',role:$('postRole').value,content:v,likes:0});if(bad(r))return;$('postIn').value='';loadPosts()});
 $('feed').addEventListener('click',async function(e){var b=e.target.closest('.like');if(!b)return;var r=await sb.rpc('increment_like',{post_id:b.dataset.id});if(!bad(r))loadPosts()});
 P99.reload=function(){loadGoals();loadLogs();loadPosts()};
 P99.reload();
@@ -587,7 +583,7 @@ P99.reload();
     try{ id = localStorage.getItem(SESSION_KEY); }catch(e){}
     if(!id){ setProfile(null); return; }
     try{
-      var r = await sb.from('profiles').select('id,name,email').eq('id', id).maybeSingle();
+      var r = await sb.from('profiles').select('id,username').eq('id', id).maybeSingle();
       if(r.data){ setProfile(r.data); }
       else { clearId(); setProfile(null); }
     }catch(err){
@@ -605,26 +601,33 @@ P99.reload();
   panelSignup.addEventListener('submit', async function(e){
     e.preventDefault();
     var msg = document.getElementById('suMsg');
-    var name = document.getElementById('suName').value.trim();
-    var email = document.getElementById('suEmail').value.trim().toLowerCase();
+    var username = document.getElementById('suName').value.trim().toLowerCase();
     var pass = document.getElementById('suPassword').value;
     var confirm = document.getElementById('suConfirm').value;
 
-    if(!name || !email || pass.length < 6){
-      msg.textContent = 'Fill in every field \u2014 password needs at least 6 characters.';
+    if(!username || pass.length < 6){
+      msg.textContent = 'Pick a username and a password of at least 6 characters.';
+      return;
+    }
+    if(username.length < 3){
+      msg.textContent = 'Username must be at least 3 characters.';
+      return;
+    }
+    if(!/^[a-z0-9_]+$/.test(username)){
+      msg.textContent = 'Username can only use letters, numbers, and underscores.';
       return;
     }
     if(pass !== confirm){
-      msg.textContent = 'Passwords don\u2019t match.';
+      msg.textContent = 'Passwords don\'t match.';
       return;
     }
-    var ex = await sb.from('profiles').select('id').eq('email', email).maybeSingle();
+    var ex = await sb.from('profiles').select('id').eq('username', username).maybeSingle();
     if(ex.error){ msg.textContent = 'Something went wrong. Try again.'; return; }
     if(ex.data){
-      msg.textContent = 'An account with that email already exists.';
+      msg.textContent = 'That username is already taken.';
       return;
     }
-    var ins = await sb.from('profiles').insert({ name: name, email: email, password: pass }).select('id,name,email').single();
+    var ins = await sb.from('profiles').insert({ username: username, password: pass }).select('id,username').single();
     if(ins.error || !ins.data){ msg.textContent = 'Something went wrong. Try again.'; return; }
     storeId(ins.data.id);
     setProfile(ins.data);
@@ -637,11 +640,11 @@ P99.reload();
   panelLogin.addEventListener('submit', async function(e){
     e.preventDefault();
     var msg = document.getElementById('liMsg');
-    var email = document.getElementById('liEmail').value.trim().toLowerCase();
+    var username = document.getElementById('liEmail').value.trim().toLowerCase();
     var pass = document.getElementById('liPassword').value;
-    var r = await sb.from('profiles').select('id,name,email').eq('email', email).eq('password', pass).maybeSingle();
+    var r = await sb.from('profiles').select('id,username').eq('username', username).eq('password', pass).maybeSingle();
     if(!r.data){
-      msg.textContent = 'No account matches that email and password.';
+      msg.textContent = 'No account matches that username and password.';
       return;
     }
     storeId(r.data.id);

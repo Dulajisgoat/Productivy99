@@ -802,7 +802,7 @@ P99.reload();
   // Returns { ok: true, profile } or { ok: false, code, message }
   async function callAuthFn(name, username, password){
     try{
-      var r = await sb.functions.invoke(name, { body: { username: username, password: password } });
+      var r = await sb.functions.invoke('auth', { body: { action: name, username: username, password: password } });
       if(r.error){
         console.error(name, r.error);
         var body = null;
@@ -892,3 +892,4 @@ P99.reload();
 
 </body>
 </html>
+

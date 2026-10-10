@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="light">
+<html lang="en" data-theme="light" class="boot">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -36,7 +36,6 @@
     background:var(--bg);
     color:var(--ink);
     font-family:"Archivo",sans-serif;
-    transition:background .35s ease, color .35s ease;
     -webkit-font-smoothing:antialiased;
   }
   h1,h2,h3{
@@ -54,7 +53,6 @@
     position:sticky;top:0;z-index:40;
     background:var(--bg);
     border-bottom:1px solid var(--border);
-    transition:background .35s ease, border-color .35s ease;
   }
   nav .wrap{
     display:flex;align-items:center;justify-content:space-between;
@@ -179,14 +177,6 @@
     color:var(--ink-soft);font-size:1.3rem;line-height:1;
   }
   .modal-close:hover{color:var(--wine);}
-  .tabs{display:flex;gap:22px;margin-bottom:26px;border-bottom:1px solid var(--border);}
-  .tab{
-    background:none;border:none;font-family:"Archivo",sans-serif;
-    font-size:.95rem;font-weight:600;color:var(--ink-soft);
-    padding:0 0 12px;cursor:pointer;border-bottom:2px solid transparent;
-    margin-bottom:-1px;
-  }
-  .tab.active{color:var(--ink);border-bottom-color:var(--wine);}
   .form-panel{display:none;flex-direction:column;gap:16px;}
   .form-panel.active{display:flex;}
   label{font-size:.82rem;color:var(--ink-soft);display:block;margin-bottom:6px;}
@@ -200,7 +190,6 @@
   input:focus{outline:none;border-color:var(--wine);}
   .field-msg{font-size:.78rem;color:var(--wine);min-height:16px;margin-top:4px;}
   .modal .btn-solid{width:100%;margin-top:6px;padding:12px;font-size:.95rem;}
-  .modal-note{font-size:.78rem;color:var(--ink-soft);margin-top:18px;text-align:center;}
 
   @media (max-width:760px){
     .hero-inner{flex-direction:column;text-align:center;align-items:center;}
@@ -212,8 +201,8 @@
   }
 </style>
 <style id="liquid-glass">
-:root{--glass:rgba(255,255,255,.52);--glass-b:rgba(255,255,255,.75);--shadow:0 10px 36px rgba(74,8,18,.12);--r:20px}
-html[data-theme="dark"]{--glass:rgba(44,20,22,.5);--glass-b:rgba(255,255,255,.12);--shadow:0 10px 36px rgba(0,0,0,.45)}
+:root{--glass:rgba(255,255,255,.52);--glass-b:rgba(255,255,255,.75);--shadow-c:rgba(74,8,18,.12);--shadow:0 10px 36px var(--shadow-c);--r:20px}
+html[data-theme="dark"]{--glass:rgba(44,20,22,.5);--glass-b:rgba(255,255,255,.12);--shadow-c:rgba(0,0,0,.45)}
 body{overflow-x:hidden}
 .orbs{position:fixed;inset:0;z-index:-1;overflow:hidden;pointer-events:none}
 .orbs i{position:absolute;border-radius:50%;filter:blur(80px);opacity:.5;animation:drift 18s ease-in-out infinite alternate}
@@ -283,6 +272,90 @@ ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:12p
 @media(max-width:760px){.grid3{grid-template-columns:1fr}#postForm{grid-template-columns:1fr}.hero-logo{flex-basis:auto}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition-duration:.01s!important}.rv{opacity:1;transform:none}}
 </style>
+<style id="polish">
+/* ---- Animatable theme colours: the whole page eases between light and dark ---- */
+@property --bg{syntax:'<color>';inherits:true;initial-value:#F7F1EF}
+@property --surface{syntax:'<color>';inherits:true;initial-value:#FFFFFF}
+@property --ink{syntax:'<color>';inherits:true;initial-value:#1C1412}
+@property --ink-soft{syntax:'<color>';inherits:true;initial-value:#6B5955}
+@property --wine{syntax:'<color>';inherits:true;initial-value:#7A0C1E}
+@property --wine-dark{syntax:'<color>';inherits:true;initial-value:#4A0812}
+@property --wine-soft{syntax:'<color>';inherits:true;initial-value:rgba(122,12,30,0.08)}
+@property --border{syntax:'<color>';inherits:true;initial-value:rgba(28,20,18,0.14)}
+@property --glass{syntax:'<color>';inherits:true;initial-value:rgba(255,255,255,.52)}
+@property --glass-b{syntax:'<color>';inherits:true;initial-value:rgba(255,255,255,.75)}
+@property --shadow-c{syntax:'<color>';inherits:true;initial-value:rgba(74,8,18,.12)}
+@property --field{syntax:'<color>';inherits:true;initial-value:rgba(255,255,255,.62)}
+:root{--field:rgba(255,255,255,.62)}
+html[data-theme="dark"]{--field:rgba(255,255,255,.06)}
+html{
+  transition-property:--bg,--surface,--ink,--ink-soft,--wine,--wine-dark,--wine-soft,--border,--glass,--glass-b,--shadow-c,--field;
+  transition-duration:.6s;
+  transition-timing-function:cubic-bezier(.4,0,.2,1);
+}
+html.boot{transition:none!important}
+/* fallback for browsers without @property */
+html.no-prop.theme-anim,html.no-prop.theme-anim *,html.no-prop.theme-anim *::before,html.no-prop.theme-anim *::after{
+  transition:background-color .5s ease,color .5s ease,border-color .5s ease,box-shadow .5s ease!important;
+}
+.hero-logo img{transition:opacity .24s ease,transform .24s ease}
+.brand img{transition:opacity .24s ease}
+html.logo-swap .brand img{opacity:0}
+
+/* ---- Icon buttons (pure CSS icons) ---- */
+.power-toggle:hover{transform:none}
+.bat{position:relative;box-sizing:content-box;width:18px;height:9px;margin-right:3px;border:2px solid currentColor;border-radius:3px}
+.bat::before{content:"";position:absolute;left:1px;top:1px;bottom:1px;right:1px;background:currentColor;border-radius:1px;transform-origin:left center;transition:transform .35s cubic-bezier(.4,0,.2,1)}
+.bat::after{content:"";position:absolute;right:-5px;top:50%;width:2px;height:4px;margin-top:-2px;background:currentColor;border-radius:0 2px 2px 0}
+html[data-power="low"] .power-toggle{color:var(--wine);border-color:var(--wine)}
+html[data-power="low"] .bat::before{transform:scaleX(.32)}
+
+/* ---- Auth modal ---- */
+.overlay{display:flex;opacity:0;visibility:hidden;pointer-events:none;transition:opacity .25s ease,visibility 0s linear .25s}
+.overlay.open{opacity:1;visibility:visible;pointer-events:auto;transition:opacity .25s ease,visibility 0s}
+.modal{max-width:380px;padding:32px 30px 28px;opacity:0;transform:translateY(12px) scale(.985);transition:transform .32s cubic-bezier(.2,.8,.2,1),opacity .25s ease}
+.overlay.open .modal{opacity:1;transform:none;animation:none}
+.modal-close{width:32px;height:32px;top:14px;right:14px;border-radius:50%;display:flex;align-items:center;justify-content:center;transition:color .2s ease,background-color .2s ease}
+.modal-close:hover{background:var(--wine-soft)}
+.modal-close .x{position:relative;display:block;width:14px;height:14px}
+.modal-close .x::before,.modal-close .x::after{content:"";position:absolute;left:0;top:50%;width:100%;height:2px;margin-top:-1px;background:currentColor;border-radius:2px;transform:rotate(45deg)}
+.modal-close .x::after{transform:rotate(-45deg)}
+.modal h2{font-size:1.55rem;line-height:1.15;padding-right:28px}
+.auth-hint{margin:8px 0 22px;font-size:.88rem;line-height:1.5;color:var(--ink-soft)}
+#authForm{display:flex;flex-direction:column;gap:16px}
+.modal input{height:44px;border-radius:10px;background:var(--field)}
+.fld-confirm{display:grid;grid-template-rows:0fr;margin-top:-16px;opacity:0;visibility:hidden;transition:grid-template-rows .3s ease,margin .3s ease,opacity .2s ease,visibility 0s linear .3s}
+#authForm.is-signup .fld-confirm{grid-template-rows:1fr;margin-top:0;opacity:1;visibility:visible;transition:grid-template-rows .3s ease,margin .3s ease,opacity .25s ease .05s,visibility 0s}
+.fld-inner{min-height:0;overflow:hidden;padding:4px;margin:-4px}
+#authForm .field-msg{margin-top:-4px}
+.modal .btn-solid{margin-top:0;height:46px;padding:0 16px;border-radius:10px;background:var(--wine);box-shadow:none;font-size:.95rem}
+.modal .btn-solid::after{display:none}
+.modal .btn-solid:hover{background:var(--wine-dark);transform:none}
+.modal .btn-solid:disabled{opacity:.6;cursor:default}
+.auth-switch{margin:18px 0 0;font-size:.88rem;color:var(--ink-soft)}
+.auth-switch button{background:none;border:0;padding:0;font:inherit;font-weight:600;color:var(--wine);cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+.auth-switch button:hover{color:var(--wine-dark)}
+.modal :focus-visible{outline:2px solid var(--wine);outline-offset:2px}
+.modal input:focus-visible{outline:none}
+
+/* ---- Low power mode ---- */
+html[data-power="low"]{--glass:rgba(255,255,255,.94);--glass-b:rgba(28,20,18,.1);--shadow-c:rgba(74,8,18,.08);--shadow:0 2px 8px var(--shadow-c)}
+html[data-theme="dark"][data-power="low"]{--glass:rgba(34,17,18,.96);--glass-b:rgba(255,255,255,.1);--shadow-c:rgba(0,0,0,.3)}
+html[data-power="low"],html[data-power="low"] *,html[data-power="low"] *::before,html[data-power="low"] *::after{
+  animation:none!important;
+  transition-duration:.01s!important;
+  transition-delay:0s!important;
+  scroll-behavior:auto!important;
+  backdrop-filter:none!important;
+  -webkit-backdrop-filter:none!important;
+}
+html[data-power="low"] .orbs,html[data-power="low"] .hero-logo::before{display:none}
+html[data-power="low"] .rv{opacity:1;transform:none}
+html[data-power="low"] h1.display{background:none;color:var(--ink)}
+html[data-power="low"] .btn-solid::after{display:none}
+html[data-power="low"] .overlay{background:rgba(10,5,4,.7)}
+@media(prefers-reduced-motion:reduce){html{transition:none}}
+</style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 </head>
 <body>
@@ -299,12 +372,14 @@ ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:12p
       <a href="#workspace" id="navWorkspace" style="display:none;">Workspace</a>
     </div>
     <div class="nav-right">
+      <button class="theme-toggle power-toggle" id="powerToggle" type="button" aria-label="Low power mode" aria-pressed="false" title="Low power mode">
+        <span class="bat" aria-hidden="true"></span>
+      </button>
       <button class="theme-toggle" id="themeToggle" aria-label="Switch between light and dark mode">
         <span class="ico" aria-hidden="true"></span>
       </button>
       <div id="authButtons" style="display:flex;gap:10px;">
-        <button class="btn btn-ghost" id="openLogin">Log in</button>
-        <button class="btn btn-solid" id="openSignup">Sign up</button>
+        <button class="btn btn-solid" id="openAuth">Log in</button>
       </div>
       <div id="accountChip">
         <span id="accountName"></span>
@@ -379,14 +454,37 @@ ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:12p
 </footer>
 
 <!-- ---------- Auth modal ---------- -->
-<div class="overlay" id="overlay">
-  <div class="modal">
-    <button class="modal-close" id="modalClose" aria-label="Close">&times;</button>
-    <div class="tabs">
-      <button class="tab active" id="tabSignup">Create account</button>
-      <button class="tab" id="tabLogin">Log in</button>
-    </div>
+<div class="overlay" id="overlay" aria-hidden="true">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="authTitle">
+    <button class="modal-close" id="modalClose" type="button" aria-label="Close"><span class="x" aria-hidden="true"></span></button>
+    <h2 id="authTitle">Create an account</h2>
+    <p class="auth-hint" id="authHint">Pick a username and a password. No email needed.</p>
 
+    <form id="authForm" class="is-signup" novalidate>
+      <div>
+        <label for="auName">Username</label>
+        <input type="text" id="auName" autocomplete="username" autocapitalize="none" spellcheck="false">
+      </div>
+      <div>
+        <label for="auPass">Password</label>
+        <input type="password" id="auPass" autocomplete="new-password">
+      </div>
+      <div class="fld-confirm">
+        <div class="fld-inner">
+          <label for="auConfirm">Confirm password</label>
+          <input type="password" id="auConfirm" autocomplete="new-password">
+        </div>
+      </div>
+      <div class="field-msg" id="authMsg" role="alert"></div>
+      <button type="submit" class="btn btn-solid" id="authSubmit">Create account</button>
+    </form>
+
+    <p class="auth-switch"><span id="authSwitchText">Already have an account?</span> <button type="button" id="authSwitch">Log in</button></p>
+  </div>
+</div>
+
+<!-- The original signup and login forms stay in the page (hidden) because they carry the unchanged handlers. -->
+<div id="authCore" hidden aria-hidden="true">
     <form class="form-panel active" id="panelSignup" novalidate>
       <div>
         <label for="suName">Username</label>
@@ -417,8 +515,6 @@ ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:12p
       <button type="submit" class="btn btn-solid">Log in</button>
     </form>
 
-    <div class="modal-note">Pick a username and password — no email needed.</div>
-  </div>
 </div>
 
 <script>
@@ -456,46 +552,150 @@ ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:12p
   root.setAttribute('data-theme', initial);
   applyLogos(initial);
 
-  toggle.addEventListener('click', function(){
-    var current = root.getAttribute('data-theme');
-    var next = current === 'dark' ? 'light' : 'dark';
+  if(!(window.CSS && CSS.registerProperty)){ root.classList.add('no-prop'); }
 
+  var logoTimer = null, animTimer = null;
+  toggle.addEventListener('click', function(){
+    var next = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+
+    // Colours start easing right away; the logo fades out, swaps, and fades back in underneath.
+    root.classList.add('theme-anim', 'logo-swap');
     heroWrap.classList.add('swap');
-    setTimeout(function(){
-      root.setAttribute('data-theme', next);
+    root.setAttribute('data-theme', next);
+    storeTheme(next);
+
+    clearTimeout(logoTimer);
+    logoTimer = setTimeout(function(){
       applyLogos(next);
-      storeTheme(next);
-      setTimeout(function(){ heroWrap.classList.remove('swap'); }, 30);
-    }, 180);
+      setTimeout(function(){
+        root.classList.remove('logo-swap');
+        heroWrap.classList.remove('swap');
+      }, 30);
+    }, 240);
+
+    clearTimeout(animTimer);
+    animTimer = setTimeout(function(){ root.classList.remove('theme-anim'); }, 700);
   });
+
+  /* ---------- Low power mode ---------- */
+  var powerBtn = document.getElementById('powerToggle');
+  function getStoredPower(){
+    try{ return localStorage.getItem('prod99_power'); }catch(e){ return null; }
+  }
+  function storePower(v){
+    try{ localStorage.setItem('prod99_power', v); }catch(e){}
+  }
+  function applyPower(on){
+    if(on){ root.setAttribute('data-power', 'low'); }
+    else { root.removeAttribute('data-power'); }
+    powerBtn.setAttribute('aria-pressed', on ? 'true' : 'false');
+    powerBtn.title = on ? 'Low power mode is on' : 'Low power mode';
+  }
+  applyPower(getStoredPower() === 'low');
+  powerBtn.addEventListener('click', function(){
+    var on = root.getAttribute('data-power') !== 'low';
+    applyPower(on);
+    storePower(on ? 'low' : 'off');
+  });
+
+  // Allow transitions only after the first paint, so loading in dark mode doesn't animate.
+  requestAnimationFrame(function(){ requestAnimationFrame(function(){ root.classList.remove('boot'); }); });
 
   /* ---------- Auth modal ---------- */
   var overlay = document.getElementById('overlay');
-  var tabSignup = document.getElementById('tabSignup');
-  var tabLogin = document.getElementById('tabLogin');
   var panelSignup = document.getElementById('panelSignup');
   var panelLogin = document.getElementById('panelLogin');
 
-  function openModal(which){
-    overlay.classList.add('open');
-    showTab(which || 'signup');
+  var authForm = document.getElementById('authForm');
+  var auName = document.getElementById('auName');
+  var auPass = document.getElementById('auPass');
+  var auConfirm = document.getElementById('auConfirm');
+  var auMsg = document.getElementById('authMsg');
+  var auTitle = document.getElementById('authTitle');
+  var auHint = document.getElementById('authHint');
+  var auSubmit = document.getElementById('authSubmit');
+  var auSwitch = document.getElementById('authSwitch');
+  var auSwitchText = document.getElementById('authSwitchText');
+  var authMode = 'signup';
+  var busyTimer = null;
+
+  function setBusy(on){
+    clearTimeout(busyTimer);
+    auSubmit.disabled = on;
+    if(on){ busyTimer = setTimeout(function(){ auSubmit.disabled = false; }, 10000); }
   }
-  function closeModal(){ overlay.classList.remove('open'); }
-  function showTab(which){
-    var signup = which === 'signup';
-    tabSignup.classList.toggle('active', signup);
-    tabLogin.classList.toggle('active', !signup);
-    panelSignup.classList.toggle('active', signup);
-    panelLogin.classList.toggle('active', !signup);
+  function setMode(which){
+    authMode = which === 'login' ? 'login' : 'signup';
+    var signup = authMode === 'signup';
+    authForm.classList.toggle('is-signup', signup);
+    auTitle.textContent = signup ? 'Create an account' : 'Log in';
+    auHint.textContent = signup ? 'Pick a username and a password. No email needed.' : 'Use the username and password you signed up with.';
+    auSubmit.textContent = signup ? 'Create account' : 'Log in';
+    auSwitchText.textContent = signup ? 'Already have an account?' : 'New here?';
+    auSwitch.textContent = signup ? 'Log in' : 'Create an account';
+    auPass.setAttribute('autocomplete', signup ? 'new-password' : 'current-password');
+    auMsg.textContent = '';
+    document.getElementById('suMsg').textContent = '';
+    document.getElementById('liMsg').textContent = '';
+    setBusy(false);
+  }
+  function openModal(which){
+    setMode(which || 'signup');
+    overlay.classList.add('open');
+    overlay.setAttribute('aria-hidden', 'false');
+    setTimeout(function(){ auName.focus(); }, 60);
+  }
+  function closeModal(){
+    overlay.classList.remove('open');
+    overlay.setAttribute('aria-hidden', 'true');
+    setBusy(false);
+    setTimeout(function(){
+      if(overlay.classList.contains('open')){ return; }
+      authForm.reset();
+      auMsg.textContent = '';
+    }, 280);
   }
 
-  document.getElementById('openSignup').addEventListener('click', function(){ openModal('signup'); });
+  // The visible form hands its values to the original signup/login forms, which hold the real handlers.
+  authForm.addEventListener('submit', function(e){
+    e.preventDefault();
+    if(auSubmit.disabled){ return; }
+    var panel;
+    if(authMode === 'signup'){
+      document.getElementById('suName').value = auName.value;
+      document.getElementById('suPassword').value = auPass.value;
+      document.getElementById('suConfirm').value = auConfirm.value;
+      panel = panelSignup;
+    } else {
+      document.getElementById('liEmail').value = auName.value;
+      document.getElementById('liPassword').value = auPass.value;
+      panel = panelLogin;
+    }
+    setBusy(true);
+    panel.dispatchEvent(new Event('submit', { cancelable: true }));
+  });
+
+  // Show whatever message the handlers write, then let the person try again.
+  function mirrorMsg(){
+    var src = document.getElementById(authMode === 'signup' ? 'suMsg' : 'liMsg');
+    auMsg.textContent = src.textContent;
+    if(src.textContent){ setBusy(false); }
+  }
+  if(window.MutationObserver){
+    var mo = new MutationObserver(mirrorMsg);
+    var moOpts = { childList: true, characterData: true, subtree: true };
+    mo.observe(document.getElementById('suMsg'), moOpts);
+    mo.observe(document.getElementById('liMsg'), moOpts);
+  }
+
+  document.getElementById('openAuth').addEventListener('click', function(){ openModal('login'); });
   document.getElementById('heroSignup').addEventListener('click', function(){ openModal('signup'); });
-  document.getElementById('openLogin').addEventListener('click', function(){ openModal('login'); });
   document.getElementById('modalClose').addEventListener('click', closeModal);
   overlay.addEventListener('click', function(e){ if(e.target === overlay) closeModal(); });
-  tabSignup.addEventListener('click', function(){ showTab('signup'); });
-  tabLogin.addEventListener('click', function(){ showTab('login'); });
+  auSwitch.addEventListener('click', function(){ setMode(authMode === 'signup' ? 'login' : 'signup'); auName.focus(); });
+  document.addEventListener('keydown', function(e){
+    if(e.key === 'Escape' && overlay.classList.contains('open')){ closeModal(); }
+  });
 
   /* ---------- Supabase profiles (no Supabase Auth) ---------- */
   var SB_URL = "https://bbsxacrwjezzmxqazast.supabase.co";
@@ -598,30 +798,24 @@ P99.reload();
     toTop();
   });
 
-  // Returns { ok: true, profile } or { ok: false, message }
+  // Shared auth-function caller.
+  // Returns { ok: true, profile } or { ok: false, code, message }
   async function callAuthFn(name, username, password){
-    try {
+    try{
       var r = await sb.functions.invoke(name, { body: { username: username, password: password } });
       if(r.error){
         console.error(name, r.error);
-        // supabase-js wraps non-2xx in r.error; try to pull the body message
-        var ctx = r.error.context;
         var body = null;
-        try { body = (ctx && ctx.json) ? await ctx.json() : null; } catch(e) {}
-        return { ok: false, code: ctx ? ctx.status : undefined, message: (body && body.error) || r.error.message };
+        try{ body = await r.error.context.json(); }catch(e){}
+        return { ok:false, code: r.error.context && r.error.context.status, message: (body && body.error) || r.error.message };
       }
       if(r.data && r.data.error){
-        console.error(name, r.data);
-        return { ok: false, code: r.data.code, message: r.data.error };
+        return { ok:false, code: r.data.code, message: r.data.error };
       }
-      if(!r.data || !r.data.id){
-        console.error(name, 'Unexpected response', r.data);
-        return { ok: false, message: 'Unexpected response' };
-      }
-      return { ok: true, profile: r.data };
-    } catch(err) {
+      return { ok:true, profile: r.data };
+    }catch(err){
       console.error(name, err);
-      return { ok: false, message: 'Network error' };
+      return { ok:false, message: 'Network error' };
     }
   }
 
@@ -648,17 +842,15 @@ P99.reload();
       msg.textContent = 'Passwords don\'t match.';
       return;
     }
-    var r = await callAuthFn('signup', username, pass);
-    if(!r.ok){
-      if(r.message === 'Username taken' || r.code === 409){
-        msg.textContent = 'That username is already taken.';
-      } else {
-        msg.textContent = 'Something went wrong. Try again.';
-      }
+    var res = await callAuthFn('signup', username, pass);
+    if(!res.ok){
+      msg.textContent = (res.code === 409 || res.message === 'Username taken')
+        ? 'That username is already taken.'
+        : 'Something went wrong. Try again.';
       return;
     }
-    storeId(r.profile.id);
-    setProfile(r.profile);
+    storeId(res.profile.id);
+    setProfile(res.profile);
     msg.textContent = '';
     panelSignup.reset();
     closeModal();
@@ -670,13 +862,13 @@ P99.reload();
     var msg = document.getElementById('liMsg');
     var username = document.getElementById('liEmail').value.trim().toLowerCase();
     var pass = document.getElementById('liPassword').value;
-    var r = await callAuthFn('login', username, pass);
-    if(!r.ok){
+    var res = await callAuthFn('login', username, pass);
+    if(!res.ok){
       msg.textContent = 'No account matches that username and password.';
       return;
     }
-    storeId(r.profile.id);
-    setProfile(r.profile);
+    storeId(res.profile.id);
+    setProfile(res.profile);
     msg.textContent = '';
     panelLogin.reset();
     closeModal();

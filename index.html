@@ -598,6 +598,33 @@ P99.reload();
     toTop();
   });
 
+  // Returns { ok: true, profile } or { ok: false, message }
+  async function callAuthFn(name, username, password){
+    try {
+      var r = await sb.functions.invoke(name, { body: { username: username, password: password } });
+      if(r.error){
+        console.error(name, r.error);
+        // supabase-js wraps non-2xx in r.error; try to pull the body message
+        var ctx = r.error.context;
+        var body = null;
+        try { body = (ctx && ctx.json) ? await ctx.json() : null; } catch(e) {}
+        return { ok: false, code: ctx ? ctx.status : undefined, message: (body && body.error) || r.error.message };
+      }
+      if(r.data && r.data.error){
+        console.error(name, r.data);
+        return { ok: false, code: r.data.code, message: r.data.error };
+      }
+      if(!r.data || !r.data.id){
+        console.error(name, 'Unexpected response', r.data);
+        return { ok: false, message: 'Unexpected response' };
+      }
+      return { ok: true, profile: r.data };
+    } catch(err) {
+      console.error(name, err);
+      return { ok: false, message: 'Network error' };
+    }
+  }
+
   panelSignup.addEventListener('submit', async function(e){
     e.preventDefault();
     var msg = document.getElementById('suMsg');
@@ -621,16 +648,17 @@ P99.reload();
       msg.textContent = 'Passwords don\'t match.';
       return;
     }
-    var ex = await sb.from('profiles').select('id').eq('username', username).maybeSingle();
-    if(ex.error){ msg.textContent = 'Something went wrong. Try again.'; return; }
-    if(ex.data){
-      msg.textContent = 'That username is already taken.';
+    var r = await callAuthFn('signup', username, pass);
+    if(!r.ok){
+      if(r.message === 'Username taken' || r.code === 409){
+        msg.textContent = 'That username is already taken.';
+      } else {
+        msg.textContent = 'Something went wrong. Try again.';
+      }
       return;
     }
-    var ins = await sb.from('profiles').insert({ username: username, password: pass }).select('id,username').single();
-    if(ins.error || !ins.data){ msg.textContent = 'Something went wrong. Try again.'; return; }
-    storeId(ins.data.id);
-    setProfile(ins.data);
+    storeId(r.profile.id);
+    setProfile(r.profile);
     msg.textContent = '';
     panelSignup.reset();
     closeModal();
@@ -642,13 +670,13 @@ P99.reload();
     var msg = document.getElementById('liMsg');
     var username = document.getElementById('liEmail').value.trim().toLowerCase();
     var pass = document.getElementById('liPassword').value;
-    var r = await sb.from('profiles').select('id,username').eq('username', username).eq('password', pass).maybeSingle();
-    if(!r.data){
+    var r = await callAuthFn('login', username, pass);
+    if(!r.ok){
       msg.textContent = 'No account matches that username and password.';
       return;
     }
-    storeId(r.data.id);
-    setProfile(r.data);
+    storeId(r.profile.id);
+    setProfile(r.profile);
     msg.textContent = '';
     panelLogin.reset();
     closeModal();
